@@ -1,15 +1,12 @@
 import os
-from time import time
-from typing import Iterable, Sequence, Tuple
+from typing import Iterable
 from urllib import request
 from urllib.error import URLError
 from socket import timeout
-import logging
 import socket
 from tqdm import tqdm
 from multiprocessing import Pool
-from logger_tt import setup_logging, logger
-setup_logging(use_multiprocessing=True)
+from logger_tt import logger
 
 class MultiProcessDownloader:
     def __init__(self,n_jobs:int=16,timeout:float=30,retry:int=10):
