@@ -7,4 +7,10 @@ setup(
    author='ZeroRin',
    author_email='pptxp@qq.com',
    packages=['gf_utils'], 
+   install_requires=[
+         'tqdm',
+         'UnityPy',
+         'pycryptodome',
+         'logger_tt'
+   ],
 )

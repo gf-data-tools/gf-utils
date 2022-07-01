@@ -9,6 +9,7 @@ import socket
 from tqdm import tqdm
 from multiprocessing import Pool
 from logger_tt import setup_logging, logger
+setup_logging(use_multiprocessing=True)
 
 class MultiProcessDownloader:
     def __init__(self,n_jobs:int=16,timeout:float=30,retry:int=10):
