@@ -32,7 +32,7 @@ def download(url, path, max_retry=10):
             if not os.path.exists(path):
                 request.urlretrieve(url,path+'.tmp')
                 os.rename(path+'.tmp',path)
-        except (URLError, timeout):
+        except (URLError, timeout, ConnectionResetError):
             logger.warning(f'Failed to download {fname} for {i+1}/10 tries')
             continue
         else:
