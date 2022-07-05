@@ -13,25 +13,22 @@ class MultiProcessDownloader:
         self.n_jobs = n_jobs
         self.timeout = timeout
         self.retry = retry 
+        self.pool = Pool(n_jobs)
 
     def download(self, tasks:Iterable[Iterable]):
-        orig_timeout = socket.getdefaulttimeout()
-        socket.setdefaulttimeout(self.timeout)
-
-        nj = min(self.n_jobs, len(tasks))
-        pool = Pool(nj)
         for task in tasks:
             task.append(self.retry)
+            task.append(self.timeout)
         try:
-            for _ in tqdm(pool.imap_unordered(download_multitask, tasks),total=len(tasks),ascii=True): 
+            for _ in tqdm(self.pool.imap_unordered(download_multitask, tasks),total=len(tasks),ascii=True): 
                 pass
         except KeyboardInterrupt as e:
-            pool.terminate()
-            pool.join()
+            self.pool.terminate()
+            self.pool.join()
             raise e
-        socket.setdefaulttimeout(orig_timeout)
 
-def download(url, path, max_retry=10):
+def download(url, path, max_retry=10,timeout_sec=30):
+    socket.setdefaulttimeout(timeout_sec)
     fname = os.path.split(path)[-1]
     logger.info(f'Start downloading {fname}')
     for i in range(max_retry):
