@@ -3,6 +3,7 @@ from Crypto.Cipher import DES
 from Crypto.Util.Padding import pad
 from Crypto.Cipher import ARC4
 from gzip import GzipFile
+import time
 import base64, io
 
 def get_md5_hash(input:str):
@@ -40,3 +41,20 @@ def request_decode(src,key='yundoudou'):
     else:
         plain = request_decrypt(src,key)
     return plain
+    
+def request_encrypt(src,key):
+    hash=get_md5_hash(key)
+    righthash=get_md5_hash(hash[16:])
+    rc4Key = righthash + get_md5_hash(righthash)
+    cipher = decrypt_rc4(src,rc4Key.encode('utf-8'))
+    cipher = base64.standard_b64encode(cipher)
+    return cipher
+
+def request_encode(src,key='yundoudou',timeout=3600,expire=None):
+    if expire is None:
+        expire=str(int(time.time())+timeout)
+    hash=get_md5_hash(key)
+    lefthash=get_md5_hash(hash[:16])
+    srchash=get_md5_hash(src+lefthash)[:16]
+    plain=expire+srchash+src
+    return request_encrypt(plain.encode('utf-8'),key)
