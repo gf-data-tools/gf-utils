@@ -4,7 +4,7 @@ from urllib import request
 from urllib.error import URLError
 from socket import timeout
 import socket
-from tqdm import tqdm
+from tqdm.auto import tqdm
 from multiprocessing import Pool
 from logger_tt import logger
 
@@ -13,18 +13,22 @@ class MultiProcessDownloader:
         self.n_jobs = n_jobs
         self.timeout = timeout
         self.retry = retry 
+        self.pool = Pool(n_jobs)
 
     def download(self, tasks:Iterable[Iterable]):
-        orig_timeout = socket.getdefaulttimeout()
-        socket.setdefaulttimeout(self.timeout)
-        pool = Pool(self.n_jobs)
         for task in tasks:
             task.append(self.retry)
-        for _ in tqdm(pool.imap_unordered(download_multitask, tasks),total=len(tasks)): 
-            pass
-        socket.setdefaulttimeout(orig_timeout)
+            task.append(self.timeout)
+        try:
+            for _ in tqdm(self.pool.imap_unordered(download_multitask, tasks),total=len(tasks),ascii=True): 
+                pass
+        except KeyboardInterrupt as e:
+            self.pool.terminate()
+            self.pool.join()
+            raise e
 
-def download(url, path, max_retry=10):
+def download(url, path, max_retry=10,timeout_sec=30):
+    socket.setdefaulttimeout(timeout_sec)
     fname = os.path.split(path)[-1]
     logger.info(f'Start downloading {fname}')
     for i in range(max_retry):
