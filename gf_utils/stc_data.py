@@ -4,12 +4,45 @@ import json
 from .text_table import TextTable
 import logging
 # %%
+special_keys = {
+    "achievement": "identity",
+    "attendance_info": None,
+    "auto_mission": "mission_id",
+    "bingo_task_info": "task_id",
+    "chess_creation_logic": None,
+    "daily_info": "identity",
+    "enemy_standard_attribute": "level",
+    "equip_category": "category",
+    "equip_exp_info": "level",
+    "equip_type": "type",
+    "furniture_establish_info": "establish_id",
+    "game_config_info": "parameter_name",
+    "guild_level": "lv",
+    "gun_exp_info": "lv",
+    "gun_obtain_info": "obtain_id",
+    "kalina_favor_info": "level",
+    "main_quest_info": "identity",
+    "mission_draw_bonus": None,
+    "mission_event_prize_info": "mission_id",
+    "mission_targettrain_battlesetting": "difficult_level",
+    "sangvis_advance": "lv",
+    "sangvis_exp": "lv",
+    "seven_attendance_info": None,
+    "seven_spendpoint_info": None,
+    "squad_chip_exp": "lv",
+    "squad_exp": "lv",
+    "squad_rank": "star_id",
+    "squad_type": "type_id",
+    "weekly_info": "identity",
+}
+
 def get_stc_data(stc_dir, table_dir=None,subset=None,to_dict=True):
     stc_data = dict()
     if table_dir is not None:
         text_table = TextTable(table_dir)
     for fname in os.listdir(stc_dir):
-        if subset is not None and os.path.splitext(fname)[0] not in subset:
+        name = os.path.splitext(fname)[0]
+        if subset is not None and name not in subset:
             continue
         if fname=='catchdata':
             continue
@@ -18,9 +51,11 @@ def get_stc_data(stc_dir, table_dir=None,subset=None,to_dict=True):
             data = json.load(f)
             if table_dir is not None:
                 data = convert_text(data,text_table)
-            if len(data) > 0 and 'id' in data[0].keys() and to_dict:
-                data = {d['id']: d for d in data}
-            stc_data[os.path.splitext(fname)[0]] = data
+            if to_dict and len(data)>0:
+                k = 'id' if 'id' in data[0].keys() else special_keys[name]
+                if k is not None:
+                    data = {d[k]: d for d in data}
+            stc_data[name] = data
     return stc_data
     
 
