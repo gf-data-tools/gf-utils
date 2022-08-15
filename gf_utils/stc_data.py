@@ -65,7 +65,11 @@ def convert_text(data, text_table):
     elif type(data)==dict:
         return {k: convert_text(v,text_table) for k,v in data.items()}
     else:
-        return text_table(data)
+        text = text_table(data)
+        if text != '':
+            return text
+        else:
+            return data
 
 # %%
 if __name__=='__main__':
