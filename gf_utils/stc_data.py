@@ -11,6 +11,7 @@ special_keys = {
     "bingo_task_info": "task_id",
     "chess_creation_logic": None,
     "daily_info": "identity",
+    "daily": "identity",
     "enemy_standard_attribute": "level",
     "equip_category": "category",
     "equip_exp_info": "level",
@@ -34,6 +35,7 @@ special_keys = {
     "squad_rank": "star_id",
     "squad_type": "type_id",
     "weekly_info": "identity",
+    "weekly": "identity",
 }
 
 def get_stc_data(stc_dir, table_dir=None,subset=None,to_dict=True):
@@ -52,7 +54,7 @@ def get_stc_data(stc_dir, table_dir=None,subset=None,to_dict=True):
             if table_dir is not None:
                 data = convert_text(data,text_table)
             if to_dict and len(data)>0:
-                k = 'id' if 'id' in data[0].keys() else special_keys[name]
+                k = 'id' if 'id' in data[0].keys() else (special_keys[name] if name in special_keys.keys() else None)
                 if k is not None:
                     data = {d[k]: d for d in data}
             stc_data[name] = data
