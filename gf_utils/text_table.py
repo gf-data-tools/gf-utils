@@ -1,25 +1,31 @@
-# %%
-import os
 import logging
+from pathlib import Path
 import re
-# %%
-class TextTable():
-    def __init__(self, table_dir):
-        self.dict = dict()
-        for fname in os.listdir(table_dir):
-            if fname == 'tableconfig.txt':
-                continue
-            logging.debug(f'Reading {fname}')
-            with open(os.path.join(table_dir,fname),'r',encoding='utf-8') as f:
-                for line in f.readlines():
-                    k,*vs = line.split(',')
-                    v = ','.join(vs)
-                    v = re.sub(r'//c',',',v)
-                    v = re.sub(r'//n','\n',v)
-                    self.dict[k] = v.strip()
+import csv
+
+class TextTable:
+    def __init__(self, table_dir:str):
+        self.table_dir = Path(table_dir)
+        self.tables = {}
     
     def __call__(self, k):
-        return self.dict.get(k, k)
+        return self[k]
+    
+    def __getitem__(self, k:str)->str:
+        try:
+            if k in self.tables:
+                return self.tables[k]
+            match = re.fullmatch('([A-za-z][0-9A-za-z_]+)-([0-9]+)',k)
+            table_file = match[1]
+            logging.debug(f'Reading {table_file}.txt')
+            for line in (self.table_dir / f'{table_file}.txt').open('r'):
+                key, value = line.split(',')
+                value = re.sub(r'//c',',',value)
+                value = re.sub(r'//n','\n',value)
+                self.tables[key] = value.strip()
+            return self.tables[k]
+        except (TypeError, KeyError, FileNotFoundError):
+            return k
                     
 
 # %%

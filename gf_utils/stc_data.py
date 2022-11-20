@@ -3,6 +3,9 @@ import os
 import json
 from .text_table import TextTable
 import logging
+from collections.abc import MutableMapping
+from cachetools.func import lru_cache
+from pathlib import Path
 # %%
 special_keys = {
     "achievement": "identity",
@@ -38,28 +41,40 @@ special_keys = {
     "weekly": "identity",
 }
 
-def get_stc_data(stc_dir, table_dir=None,subset=None,to_dict=True):
-    stc_data = dict()
-    if table_dir is not None:
-        text_table = TextTable(table_dir)
-    for fname in os.listdir(stc_dir):
-        name = os.path.splitext(fname)[0]
-        if subset is not None and name not in subset:
-            continue
-        if fname=='catchdata':
-            continue
-        logging.debug(f'Reading {fname}')
-        with open(os.path.join(stc_dir,fname),encoding='utf-8') as f:
+class GameData(MutableMapping):
+    def __init__(self, stc_dir, table_dir=None, to_dict=True) -> None:
+        self.stc_dir = Path(stc_dir)
+        self.text_table = TextTable(table_dir) if table_dir else str
+        self.to_dict = to_dict
+        self.__keys = [p.name[:-5] for p in self.stc_dir.glob('*.json')]
+        self.__data = {}
+    
+    def __get_stc_dict(self, name):
+        logging.debug(f'Reading {name}.json')
+        with (self.stc_dir/f'{name}.json').open('r',encoding='utf-8') as f:
             data = json.load(f)
-            if table_dir is not None:
-                data = convert_text(data,text_table)
-            if to_dict and len(data)>0:
+            data = convert_text(data,self.text_table)
+            if self.to_dict and len(data)>0:
                 k = 'id' if 'id' in data[0].keys() else (special_keys[name] if name in special_keys.keys() else None)
                 if k is not None:
                     data = {d[k]: d for d in data}
-            stc_data[name] = data
-    return stc_data
-    
+        return data
+
+    def __getitem__(self, key):
+        if key not in self.__keys:
+            raise KeyError(key)
+        if key not in self.__data:
+            self.__data[key] = self.__get_stc_dict(key)
+        return self.__data[key]
+        
+    def __call__(self, k): return self.__getitem__(k)
+    def __setitem__(self, key, value): pass
+    def __delitem__(self, key): pass
+    def __iter__(self): return iter(self.__keys)
+    def __len__(self): return len(self.__keys)
+
+def get_stc_data(stc_dir, table_dir=None,subset=None,to_dict=True):
+    return GameData(stc_dir,table_dir,to_dict)
 
 def convert_text(data, text_table):
     if type(data)==list:
