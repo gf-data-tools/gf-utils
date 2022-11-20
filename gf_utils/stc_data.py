@@ -44,7 +44,7 @@ special_keys = {
 class GameData(MutableMapping):
     def __init__(self, stc_dir, table_dir=None, to_dict=True) -> None:
         self.stc_dir = Path(stc_dir)
-        self.text_table = TextTable(table_dir) if table_dir else str
+        self.text_table = TextTable(table_dir) if table_dir else lambda x:x
         self.to_dict = to_dict
         self.__keys = [p.name[:-5] for p in self.stc_dir.glob('*.json')]
         self.__data = {}
@@ -66,8 +66,9 @@ class GameData(MutableMapping):
         if key not in self.__data:
             self.__data[key] = self.__get_stc_dict(key)
         return self.__data[key]
-        
-    def __call__(self, k): return self.__getitem__(k)
+    
+    def __getattr__(self, k): return self[k]
+    def __call__(self, k): return self[k]
     def __setitem__(self, key, value): pass
     def __delitem__(self, key): pass
     def __iter__(self): return iter(self.__keys)
