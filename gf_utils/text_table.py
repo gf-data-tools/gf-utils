@@ -19,7 +19,7 @@ class TextTable:
             table_file = match[1]
             logging.debug(f'Reading {table_file}.txt')
             for line in (self.table_dir / f'{table_file}.txt').open('r'):
-                key, value = line.split(',')
+                key, value = line.split(',',maxsplit=1)
                 value = re.sub(r'//c',',',value)
                 value = re.sub(r'//n','\n',value)
                 self.tables[key] = value.strip()
