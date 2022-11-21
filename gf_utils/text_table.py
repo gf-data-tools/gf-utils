@@ -24,7 +24,7 @@ class TextTable:
                 value = re.sub(r'//n','\n',value)
                 self.tables[key] = value.strip()
             return self.tables[k]
-        except (TypeError, KeyError, FileNotFoundError):
+        except (TypeError, KeyError, FileNotFoundError, ValueError):
             return k
                     
 

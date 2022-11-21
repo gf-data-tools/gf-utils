@@ -4,7 +4,6 @@ import json
 from .text_table import TextTable
 import logging
 from collections.abc import MutableMapping
-from cachetools.func import lru_cache
 from pathlib import Path
 # %%
 special_keys = {
