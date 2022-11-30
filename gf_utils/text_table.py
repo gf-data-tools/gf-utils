@@ -7,7 +7,7 @@ class TextTable:
     def __init__(self, table_dir:str):
         self.table_dir = Path(table_dir)
         self.tables = {}
-        self.keys = [fpath.name.split('.')[0] for fpath in self.table_dir.glob('*.txt')]
+        self.keys = []
 
     def __call__(self, k):
         return self[k]
@@ -27,6 +27,7 @@ class TextTable:
                     value = re.sub(r'//c',',',value)
                     value = re.sub(r'//n','\n',value)
                     self.tables[key] = value.strip()
+                self.keys.append(table_file)
                 return self.tables[k]
         except (TypeError, KeyError, FileNotFoundError, ValueError):
             return k
