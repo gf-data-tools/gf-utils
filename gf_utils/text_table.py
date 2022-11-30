@@ -1,36 +1,43 @@
 import logging
 from pathlib import Path
 import re
-import csv
+from collections.abc import MutableMapping
 
-class TextTable:
+class TextTable(MutableMapping):
     def __init__(self, table_dir:str):
         self.table_dir = Path(table_dir)
-        self.tables = {}
-        self.keys = []
+        self.__keys = [p.name[:-4] for p in self.table_dir.glob('*.txt')]
+        self.__data = {}
 
-    def __call__(self, k):
-        return self[k]
-    
-    def __getitem__(self, k:str)->str:
+    def __call__(self, key):
         try:
-            if k in self.tables:
-                return self.tables[k]
-            match = re.fullmatch(r'([a-z][0-9a-z_]+)-([0-9]+)',k)
+            match = re.fullmatch(r'([a-z][0-9a-z_]+)-([0-9]+)',key)
             table_file = match[1]
-            if table_file in self.keys:
-                return k
-            else:
-                logging.debug(f'Reading {table_file}.txt')
-                for line in (self.table_dir / f'{table_file}.txt').open('r'):
-                    key, value = line.split(',',maxsplit=1)
-                    value = re.sub(r'//c',',',value)
-                    value = re.sub(r'//n','\n',value)
-                    self.tables[key] = value.strip()
-                self.keys.append(table_file)
-                return self.tables[k]
-        except (TypeError, KeyError, FileNotFoundError, ValueError):
-            return k
+            return self[table_file][key]
+        except (KeyError,TypeError):
+            return key
+    
+    def __get_text_table(self,table_file):
+        table = {}
+        logging.debug(f'Reading {table_file}.txt')
+        for line in (self.table_dir / f'{table_file}.txt').open('r'):
+            key, value = line.strip().split(',',maxsplit=1)
+            value = re.sub(r'//c',',',value)
+            value = re.sub(r'//n','\n',value)
+            table[key] = value.strip()
+        return table
+
+    def __getitem__(self, key:str)->str:
+        if key not in self.__keys:
+            raise KeyError(key)
+        if key not in self.__data:
+            self.__data[key] = self.__get_text_table(key)
+        return self.__data[key]
+    
+    def __setitem__(self, key, value): raise TypeError('TextTable does not support manual setting')
+    def __delitem__(self, key): raise TypeError('TextTable does not support manual deletion')
+    def __iter__(self): return iter(self.__keys)
+    def __len__(self): return len(self.__keys)
                     
 
 # %%
