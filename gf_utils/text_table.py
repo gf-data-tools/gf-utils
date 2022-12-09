@@ -20,11 +20,14 @@ class TextTable(MutableMapping):
     def __get_text_table(self,table_file):
         table = {}
         logging.debug(f'Reading {table_file}.txt')
-        for line in (self.table_dir / f'{table_file}.txt').open('r'):
-            key, value = line.strip().split(',',maxsplit=1)
-            value = re.sub(r'//c',',',value)
-            value = re.sub(r'//n','\n',value)
-            table[key] = value.strip()
+        for lineno, line in enumerate((self.table_dir / f'{table_file}.txt').open('r')):
+            try:
+                key, value = line.strip().split(',',maxsplit=1)
+                value = re.sub(r'//c',',',value)
+                value = re.sub(r'//n','\n',value)
+                table[key] = value.strip()
+            except:
+                logging.error(f'In {table_file}.txt line {lineno}')
         return table
 
     def __getitem__(self, key:str)->str:
