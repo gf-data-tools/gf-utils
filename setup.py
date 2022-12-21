@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-   name='gf_data_tools',
+   name='gf-utils',
    version='1.0',
    description='A module includes various tools relates to the game girls frontline',
    author='ZeroRin',

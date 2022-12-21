@@ -33,5 +33,5 @@ class AchievementInstance:
 class Achievement(ConfigTable):
     name = 'achievement'
     
-    def __getitem__(self, k):
+    def add_instance(self, k):
         return AchievementInstance(**self._data[k])

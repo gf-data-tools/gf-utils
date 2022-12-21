@@ -1,13 +1,9 @@
-from ._base import ConfigTable
+from ._base import ConfigTable, SkillArg
 from dataclasses import dataclass
 from .battle_formula import BattleFormulaInstance
+from .battle_skill_config import BattleSkillConfigInstance
 import re
 
-
-@dataclass
-class SkillArg:
-    major:int = 1
-    minor:int = 1
 
 @dataclass
 class BattleBuffInstance:    
@@ -45,7 +41,7 @@ class BattleBuffInstance:
     defbreak_number: int|SkillArg = '0'
     maxdef_number: int|SkillArg = '0'
     cdr_number: int|SkillArg = '0'
-    forced_skill: int|SkillArg = '0'
+    forced_skill: list[BattleSkillConfigInstance] = '0'
     fix_damage: int|BattleFormulaInstance = 0
     night_view_percent: int|SkillArg = '0'
     range_number: int|SkillArg = '0'
@@ -56,18 +52,15 @@ class BattleBuffInstance:
 
 class BattleBuff(ConfigTable):
     name = 'battle_buff'
-    
-    def __getitem__(self,k):
+    def add_instance(self,k):
         modif_stats = {}
         for key, value in self._data[k].items():
-            if isinstance(value, int) and value>1000000000:
-                try:
-                    modif_stats[key] = self.gamedata.battle_formula[value-1000000000]
-                except KeyError:
-                    modif_stats[key] = None
-            if isinstance(value, str):
-                match = re.fullmatch(r'\*([0-9])([0-9][0-9])', value)
-                if match:
-                    modif_stats[key] = SkillArg(major=int(match[1]),minor=int(match[2]))
-
+            if key in ['name','description','buff_animation','buff_description']:
+                pass
+            elif key in ['available_gun_type','available_gun_type2']:
+                modif_stats[key] = eval(f"[{value}]")
+            elif key in ['forced_skill']:
+                modif_stats[key] = [self.gamedata.battle_skill_config[int(v)] for v in value.split(',')] if value and value!='0' else []
+            else:
+                modif_stats[key] = self.gamedata.get_value(value)
         return BattleBuffInstance(**(self._data[k]|modif_stats))

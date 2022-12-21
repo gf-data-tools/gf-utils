@@ -9,5 +9,5 @@ class BattleFormulaInstance:
 class BattleFormula(ConfigTable):
     name = 'battle_formula'
 
-    def __getitem__(self,k):
+    def add_instance(self,k):
         return BattleFormulaInstance(**self._data[k])
