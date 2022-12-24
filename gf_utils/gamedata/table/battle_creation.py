@@ -57,6 +57,8 @@ class BattleCreation(ConfigTable):
     def add_instance(self,k):
         modif_stats = {}
         for key, value in self._data[k].items():
+            if key=='trigger_creation_id':
+                value = self.gamedata.battle_creation[self.gamedata.get_value(value)]
             if key=='hurt_id':
                 value = self.gamedata.battle_hurt_config[self.gamedata.get_value(value)]
             elif key=='buff_id':
