@@ -20,7 +20,7 @@ class TextTable(MutableMapping):
     def __get_text_table(self,table_file):
         table = {}
         logging.debug(f'Reading {table_file}.txt')
-        for lineno, line in enumerate((self.table_dir / f'{table_file}.txt').open('r')):
+        for lineno, line in enumerate((self.table_dir / f'{table_file}.txt').open('r',errors='ignore')):
             try:
                 key, value = line.strip().split(',',maxsplit=1)
                 value = re.sub(r'//c',',',value)
