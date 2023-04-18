@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gf-utils"
+version = "0.1.0"
+authors = [{name = "ZeroRin", email = "pptxp@qq.com"}]
+description = """
+A module includes various tools relates to 
+the Girls' Frontline
+"""
+keywords = ["Girls' Frontline"]
+requires-python = ">=3.10"
+dependencies = [
+    "tqdm",
+    "pycryptodome",
+    "logger_tt",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+
+[project.optional-dependencies]
+
+[project.scripts]
+
+[tool.setuptools]
+packages = [
+    'gf_utils', 
+    'gf_utils2',
+]
+
+[tool.isort]
+profile = "black"
