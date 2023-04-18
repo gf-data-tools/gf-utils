@@ -1,6 +1,7 @@
-from collections.abc import MutableMapping
 from abc import abstractmethod
+from collections.abc import MutableMapping
 from dataclasses import dataclass
+
 from logger_tt import logger
 
 

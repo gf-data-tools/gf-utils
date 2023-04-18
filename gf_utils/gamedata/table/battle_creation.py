@@ -1,5 +1,6 @@
-from ._base import ConfigTable, BuffTier
 from dataclasses import dataclass
+
+from ._base import BuffTier, ConfigTable
 
 
 @dataclass

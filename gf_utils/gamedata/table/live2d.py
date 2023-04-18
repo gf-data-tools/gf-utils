@@ -1,5 +1,6 @@
-from ._base import ConfigTable
 from dataclasses import dataclass
+
+from ._base import ConfigTable
 
 
 @dataclass

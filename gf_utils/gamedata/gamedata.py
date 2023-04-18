@@ -1,8 +1,9 @@
+import re
+
 from ..stc_data import GameData as _GameData
 from .table import *
-from .table.battle_formula import BattleFormulaInstance
 from .table._base import SkillArg
-import re
+from .table.battle_formula import BattleFormulaInstance
 
 
 class GameData(_GameData):

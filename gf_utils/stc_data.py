@@ -1,10 +1,11 @@
 # %%
-import os
 import json
-from .text_table import TextTable
 import logging
+import os
 from collections.abc import MutableMapping
 from pathlib import Path
+
+from .text_table import TextTable
 
 # %%
 special_keys = {

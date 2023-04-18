@@ -1,9 +1,10 @@
 # %%
-import logging
-import struct
-import os
 import json
+import logging
+import os
+import struct
 from collections import OrderedDict
+
 
 # %%
 class StcReader:

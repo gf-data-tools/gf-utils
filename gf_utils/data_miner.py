@@ -1,25 +1,27 @@
 # %%
-import pyjson5
+import argparse
+import base64
+import gzip
+import io
 import json
 import logging
 import os
-import io
-import shutil
-from urllib import request
-from .download import download
-from .crypto import get_des_encrypted, get_md5_hash, xor_decrypt
-from .asset_extractor import unpack_all_assets
-from .format_stc import format_stc
-import base64
 import re
-import gzip
-from gzip import GzipFile
-from zipfile import ZipFile
-import argparse
-from gf_utils.stc_data import get_stc_data
+import shutil
 import traceback
+from gzip import GzipFile
+from urllib import request
+from zipfile import ZipFile
+
+import pyjson5
 from logger_tt import logger
 
+from gf_utils.stc_data import get_stc_data
+
+from .asset_extractor import unpack_all_assets
+from .crypto import get_des_encrypted, get_md5_hash, xor_decrypt
+from .download import download
+from .format_stc import format_stc
 
 hosts = {
     "us": {

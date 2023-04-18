@@ -1,6 +1,7 @@
-from ._base import ConfigTable, SkillArg, BuffTier
-from dataclasses import dataclass
 import re
+from dataclasses import dataclass
+
+from ._base import BuffTier, ConfigTable, SkillArg
 
 
 @dataclass

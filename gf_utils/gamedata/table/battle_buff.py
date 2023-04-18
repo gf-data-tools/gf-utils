@@ -1,8 +1,9 @@
-from ._base import ConfigTable, SkillArg
+import re
 from dataclasses import dataclass
+
+from ._base import ConfigTable, SkillArg
 from .battle_formula import BattleFormulaInstance
 from .battle_skill_config import BattleSkillConfigInstance
-import re
 
 
 @dataclass

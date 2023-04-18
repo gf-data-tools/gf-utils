@@ -1,7 +1,7 @@
 import logging
-from pathlib import Path
 import re
 from collections.abc import MutableMapping
+from pathlib import Path
 
 
 class TextTable(MutableMapping):
