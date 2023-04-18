@@ -14,6 +14,7 @@ from .battle_target_select_ai import BattleTargetSelectAi
 from .battle_trigger import BattleTrigger
 from .battle_watch import BattleWatch
 from .battle_watch_trigger import BattleWatchTrigger
+
 # from .bingo_info import BingoInfo
 # from .bingo_task_info import BingoTaskInfo
 # from .bingo_task_type import BingoTaskType

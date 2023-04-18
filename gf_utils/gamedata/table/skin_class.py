@@ -1,15 +1,16 @@
-
 from ._base import ConfigTable
 from dataclasses import dataclass
 
+
 @dataclass
 class SkinClassInstance:
-    id:int # 1
-    theme_type:int # 7
-    name:str # '万圣狂欢'
+    id: int  # 1
+    theme_type: int  # 7
+    name: str  # '万圣狂欢'
+
 
 class SkinClass(ConfigTable):
-    name = 'skin_class'
+    name = "skin_class"
 
-    def add_instance(self,k):
-        return SkinClassInstance(**self._data[k])    
+    def add_instance(self, k):
+        return SkinClassInstance(**self._data[k])

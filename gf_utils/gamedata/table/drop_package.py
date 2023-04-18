@@ -1,14 +1,15 @@
-
 from ._base import ConfigTable
 from dataclasses import dataclass
 
+
 @dataclass
 class DropPackageInstance:
-    id:int # 1
-    content_ids:str # ''
+    id: int  # 1
+    content_ids: str  # ''
+
 
 class DropPackage(ConfigTable):
-    name = 'drop_package'
+    name = "drop_package"
 
-    def add_instance(self,k):
-        return DropPackageInstance(**self._data[k])    
+    def add_instance(self, k):
+        return DropPackageInstance(**self._data[k])

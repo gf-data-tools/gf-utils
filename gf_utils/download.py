@@ -23,7 +23,11 @@ class MultiProcessDownloader:
             task.append(self.retry)
             task.append(self.timeout)
         try:
-            for _ in tqdm(self.pool.imap_unordered(download_multitask, tasks), total=len(tasks), ascii=True):
+            for _ in tqdm(
+                self.pool.imap_unordered(download_multitask, tasks),
+                total=len(tasks),
+                ascii=True,
+            ):
                 pass
         except KeyboardInterrupt as e:
             self.pool.terminate()
@@ -32,6 +36,7 @@ class MultiProcessDownloader:
 
 
 def download(url, path, max_retry=10, timeout_sec=30):
+    path = str(path)
     socket.setdefaulttimeout(timeout_sec)
     fname = os.path.split(path)[-1]
     logger.info(f"Start downloading {fname}")
@@ -58,9 +63,15 @@ class Downloader:
         self.timeout = timeout
 
     def download(self, tasks: Iterable[Iterable]):
-        download_func = partial(download, max_retry=self.retry, timeout_sec=self.timeout)
+        download_func = partial(
+            download, max_retry=self.retry, timeout_sec=self.timeout
+        )
         try:
-            for _ in tqdm(self.pool.imap_unordered(lambda t: download_func(*t), tasks), total=len(tasks), ascii=True):
+            for _ in tqdm(
+                self.pool.imap_unordered(lambda t: download_func(*t), tasks),
+                total=len(tasks),
+                ascii=True,
+            ):
                 pass
         except KeyboardInterrupt as e:
             self.pool.terminate()

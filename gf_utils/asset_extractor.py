@@ -6,17 +6,19 @@ import UnityPy
 
 
 def unpack_all_assets(file: str, destination_folder: str):
-    logging.info(f'unpacking {file}')
+    logging.info(f"unpacking {file}")
     env = UnityPy.load(file)
     for path, obj in env.container.items():
         data = obj.read()
         out = None
-        logging.info(f'unpacking {obj.type.name} {path}')
+        logging.info(f"unpacking {obj.type.name} {path}")
         if obj.type.name in ["TextAsset"]:
             out = data.script
         elif obj.type.name in ["MonoBehaviour"]:
             if obj.serialized_type.nodes:
-                out = json.dumps(obj.read_typetree(), indent=4, ensure_ascii=False).encode("utf8")
+                out = json.dumps(
+                    obj.read_typetree(), indent=4, ensure_ascii=False
+                ).encode("utf8")
             else:
                 out = data.raw_data
         else:

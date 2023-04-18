@@ -5,6 +5,7 @@ from .text_table import TextTable
 import logging
 from collections.abc import MutableMapping
 from pathlib import Path
+
 # %%
 special_keys = {
     "achievement": "identity",
@@ -40,21 +41,26 @@ special_keys = {
     "weekly": "identity",
 }
 
+
 class GameData(MutableMapping):
     def __init__(self, stc_dir, table_dir=None, to_dict=True) -> None:
         self.stc_dir = Path(stc_dir)
-        self.text_table = TextTable(table_dir) if table_dir else lambda x:x
+        self.text_table = TextTable(table_dir) if table_dir else lambda x: x
         self.to_dict = to_dict
-        self.__keys = [p.name[:-5] for p in self.stc_dir.glob('*.json')]
+        self.__keys = [p.name[:-5] for p in self.stc_dir.glob("*.json")]
         self.__data = {}
-    
+
     def __get_stc_dict(self, name):
-        logging.debug(f'Reading {name}.json')
-        with (self.stc_dir/f'{name}.json').open('r',encoding='utf-8') as f:
+        logging.debug(f"Reading {name}.json")
+        with (self.stc_dir / f"{name}.json").open("r", encoding="utf-8") as f:
             data = json.load(f)
-            data = convert_text(data,self.text_table)
-            if self.to_dict and len(data)>0:
-                k = 'id' if 'id' in data[0].keys() else (special_keys[name] if name in special_keys.keys() else None)
+            data = convert_text(data, self.text_table)
+            if self.to_dict and len(data) > 0:
+                k = (
+                    "id"
+                    if "id" in data[0].keys()
+                    else (special_keys[name] if name in special_keys.keys() else None)
+                )
                 if k is not None:
                     data = {d[k]: d for d in data}
         return data
@@ -65,33 +71,47 @@ class GameData(MutableMapping):
         if key not in self.__data:
             self.__data[key] = self.__get_stc_dict(key)
         return self.__data[key]
-    
-    def __getattr__(self, k): return self[k]
-    def __call__(self, k): return self[k]
-    def __setitem__(self, key, value): pass
-    def __delitem__(self, key): pass
-    def __iter__(self): return iter(self.__keys)
-    def __len__(self): return len(self.__keys)
 
-def get_stc_data(stc_dir, table_dir=None,subset=None,to_dict=True):
-    return GameData(stc_dir,table_dir,to_dict)
+    def __getattr__(self, k):
+        return self[k]
+
+    def __call__(self, k):
+        return self[k]
+
+    def __setitem__(self, key, value):
+        pass
+
+    def __delitem__(self, key):
+        pass
+
+    def __iter__(self):
+        return iter(self.__keys)
+
+    def __len__(self):
+        return len(self.__keys)
+
+
+def get_stc_data(stc_dir, table_dir=None, subset=None, to_dict=True):
+    return GameData(stc_dir, table_dir, to_dict)
+
 
 def convert_text(data, text_table):
-    if type(data)==list:
-        return [convert_text(i,text_table) for i in data]
-    elif type(data)==dict:
-        return {k: convert_text(v,text_table) for k,v in data.items()}
+    if type(data) == list:
+        return [convert_text(i, text_table) for i in data]
+    elif type(data) == dict:
+        return {k: convert_text(v, text_table) for k, v in data.items()}
     else:
         text = text_table(data)
-        if text != '':
+        if text != "":
             return text
         else:
             return data
 
+
 # %%
-if __name__=='__main__':
-    logging.basicConfig(level='DEBUG',force=True)
-    table_dir = r'.\data-miner\data\ch\asset\table'
-    stc_dir = r'.\data-miner\data\ch\stc'
-    stc = get_stc_data(stc_dir,table_dir)
+if __name__ == "__main__":
+    logging.basicConfig(level="DEBUG", force=True)
+    table_dir = r".\data-miner\data\ch\asset\table"
+    stc_dir = r".\data-miner\data\ch\stc"
+    stc = get_stc_data(stc_dir, table_dir)
 # %%

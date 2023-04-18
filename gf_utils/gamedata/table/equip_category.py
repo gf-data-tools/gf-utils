@@ -1,16 +1,17 @@
-
 from ._base import ConfigTable
 from dataclasses import dataclass
 
+
 @dataclass
 class EquipCategoryInstance:
-    category:int # 0
-    name:str # '全部'
-    en_name:str # 'Show All'
-    code:str # ''
+    category: int  # 0
+    name: str  # '全部'
+    en_name: str  # 'Show All'
+    code: str  # ''
+
 
 class EquipCategory(ConfigTable):
-    name = 'equip_category'
+    name = "equip_category"
 
-    def add_instance(self,k):
-        return EquipCategoryInstance(**self._data[k])    
+    def add_instance(self, k):
+        return EquipCategoryInstance(**self._data[k])
