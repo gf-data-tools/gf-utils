@@ -19,27 +19,27 @@ class SquadUserInfo(BaseUserInfo):
 
 @dataclass(init=False)
 class Squad(BaseGameObject):
-    id: int
-    squad_id: int
-    squad_exp: int
-    squad_level: int
-    rank: int
-    advanced_level: int
-    life: int
-    cur_def: int
-    ammo: int
-    mre: int
-    assist_damage: int
-    assist_reload: int
-    assist_hit: int
-    assist_def_break: int
-    damage: int
-    atk_speed: int
-    hit: int
-    def_: int
-    skill1: int
-    skill2: int
-    skill3: int
+    id: int = 0
+    squad_id: int = 0
+    squad_exp: int = 0
+    squad_level: int = 0
+    rank: int = 0
+    advanced_level: int = 0
+    life: int = 0
+    cur_def: int = 0
+    ammo: int = 0
+    mre: int = 0
+    assist_damage: int = 0
+    assist_reload: int = 0
+    assist_hit: int = 0
+    assist_def_break: int = 0
+    damage: int = 0
+    atk_speed: int = 0
+    hit: int = 0
+    def_: int = 0
+    skill1: int = 0
+    skill2: int = 0
+    skill3: int = 0
 
     def __init__(self, userinfo: SquadUserInfo, record: dict) -> None:
         super().__init__(userinfo)
