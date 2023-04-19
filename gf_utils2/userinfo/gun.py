@@ -69,6 +69,7 @@ class Equip(BaseGameObject):
     def __init__(
         self, record: dict[str, str] = {}, userinfo: GunUserInfo = None, **kwargs
     ) -> None:
+        self.last_adjust = {}
         super().__init__(userinfo, **kwargs)
         for k, v in record.items():
             if k == "last_adjust":
@@ -80,7 +81,7 @@ class Equip(BaseGameObject):
                 setattr(self, k, int(v))
         self.equip_info = self.gamedata["equip"][self.equip_id]
 
-    def attr(self, attr: EquipAttrs, max_adjust=True) -> int:
+    def attr(self, attr: EquipAttrs, max_adjust=False) -> int:
         equip_info = self.equip_info
         if attr.startswith("skill"):
             return equip_info[attr]
@@ -156,15 +157,15 @@ class Gun(BaseGameObject):
             if self.equip3 != 0:
                 self.equips.append(equip_with_user_info[self.equip3])
 
-    def equip_attr(self, attr: EquipAttrs, max_adjust: bool = True):
+    def equip_attr(self, attr: EquipAttrs, max_adjust: bool = False):
         return sum(equip.attr(attr, max_adjust) for equip in self.equips)
 
     def attr(
         self,
         attr: GunAttrs,
-        max_eat: bool = True,
-        max_favor: bool = True,
-        max_adjust=True,
+        max_eat: bool = False,
+        max_favor: bool = False,
+        max_adjust=False,
     ) -> int:
         gamedata = self.gamedata
         gun_info = self.gun_info
@@ -264,9 +265,15 @@ class Gun(BaseGameObject):
                 raise ValueError(f"Unsupported attr {attr}")
 
     def battle_efficiency(
-        self, night=False, max_eat: bool = True, max_favor: bool = True
+        self,
+        night=False,
+        max_eat: bool = False,
+        max_favor: bool = False,
+        max_adjust: bool = False,
     ):
-        gun_attr = partial(self.attr, max_eat=max_eat, max_favor=max_favor)
+        gun_attr = partial(
+            self.attr, max_eat=max_eat, max_favor=max_favor, max_adjust=max_adjust
+        )
         gun_info = self.gun_info
 
         dmg_factor = (gun_attr("pow") + gun_attr("armor_piercing") / 3) * (
