@@ -108,7 +108,7 @@ class Equip(BaseGameObject):
 class Gun(BaseGameObject):
     id: int = 0
     user_id: int = 0
-    gun_id: int = 0
+    gun_id: int = 1
     gun_exp: int = 0
     gun_level: int = 0
     team_id: int = 0
@@ -310,16 +310,11 @@ class Gun(BaseGameObject):
         atk_effi = gf_ceil(
             type_factor * self.number * (dmg_factor * rate_factor * hit_factor + 8)
         )
-        print(atk_effi)
-        print(f"{dmg_factor=:.3f} {rate_factor=:.3f} {hit_factor=:.3f} ")
 
         # 防御效能 = CEILING(生命*(35+闪避)/35*(4.2*100/MAX(1,100-护甲)-3.2),1)
         dodge_factor = (35 + gun_attr("dodge")) / 35
         armor_factor = 4.2 * 100 / max(1, 100 - gun_attr("armor")) - 3.2
         def_effi = gf_ceil(gun_attr("life") * dodge_factor * armor_factor)
-        print(def_effi)
-        print(f"{dodge_factor=:.3f} {armor_factor=:.3f}")
-
         # 1技能效能 = ceiling（5*(0.8+星级/10)*[35+5*(技能等级-1)]*(100+skill_effect_per)/100,1) + skill_effect
         # 2技能效能 = ceiling（5*(0.8+星级/10)*[15+2*(技能等级-1)]*(100+skill_effect_per)/100,1) + skill_effect
         skl1_effi = gf_ceil(
@@ -334,9 +329,7 @@ class Gun(BaseGameObject):
             * (0.8 + gun_info["rank"] / 10)
             * (13 + 2 * self.skill1)
             * (1 + gun_attr("skill_effect_per") / 100)
-            + gun_attr("skill_effect")
         )
         skl_effi = (skl1_effi if self.skill1 else 0) + (skl2_effi if self.skill2 else 0)
-        print(skl_effi)
 
         return atk_effi + def_effi + skl_effi
