@@ -259,9 +259,6 @@ class Gun(BaseGameObject):
                 )
                 return equip_attr(attr) + type_speed * 10
             case _:
-                [
-                    "speed", 
-                ]  # fmt:skip
                 raise ValueError(f"Unsupported attr {attr}")
 
     def battle_efficiency(
