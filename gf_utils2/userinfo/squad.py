@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import cached_property
 from math import ceil
 from typing import *
 
@@ -8,13 +9,13 @@ from .base import BaseGameObject, BaseUserInfo
 
 
 class SquadUserInfo(BaseUserInfo):
-    @property
+    @cached_property
     def squad_with_user_info(self) -> dict[int, Squad]:
-        return {int(k): Squad(self, v) for k, v in self["squad_with_user_info"].items()}
+        return {int(k): Squad(v, self) for k, v in self["squad_with_user_info"].items()}
 
-    @property
+    @cached_property
     def chip_with_user_info(self) -> dict[int, Chip]:
-        return {int(k): Chip(self, v) for k, v in self["chip_with_user_info"].items()}
+        return {int(k): Chip(v, self) for k, v in self["chip_with_user_info"].items()}
 
 
 @dataclass(init=False)
@@ -41,18 +42,23 @@ class Squad(BaseGameObject):
     skill2: int = 0
     skill3: int = 0
 
-    def __init__(self, userinfo: SquadUserInfo, record: dict) -> None:
-        super().__init__(userinfo)
+    def __init__(
+        self, record: dict = {}, userinfo: SquadUserInfo | None = None, **kwargs
+    ) -> None:
+        super().__init__(userinfo, **kwargs)
         for k, v in record.items():
             if k == "def":
                 k = "def_"
             setattr(self, k, int(v))
         self.squad_info = self.gamedata["squad"][self.squad_id]
-        self.chips = [
-            chip
-            for chip in userinfo.chip_with_user_info.values()
-            if chip.squad_with_user_id == self.id
-        ]
+        if userinfo.raw is not None:
+            self.chips = [
+                chip
+                for chip in userinfo.chip_with_user_info.values()
+                if chip.squad_with_user_id == self.id
+            ]
+        else:
+            self.chips = []
 
     def assist_attr(
         self,
@@ -172,8 +178,10 @@ class Chip(BaseGameObject):
     def_: int = 0
     is_locked: int = 0
 
-    def __init__(self, userinfo: SquadUserInfo, record: dict[str, str]) -> None:
-        super().__init__(userinfo)
+    def __init__(
+        self, record: dict[str, str] = {}, userinfo: SquadUserInfo = None, **kwargs
+    ) -> None:
+        super().__init__(userinfo, **kwargs)
         for k, v in record.items():
             if k == "def":
                 k = "def_"
