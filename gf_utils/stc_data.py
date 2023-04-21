@@ -44,10 +44,11 @@ special_keys = {
 
 
 class GameData(MutableMapping):
-    def __init__(self, stc_dir, table_dir=None, to_dict=True) -> None:
+    def __init__(self, stc_dir, table_dir=None, to_dict=True, fill_empty=True) -> None:
         self.stc_dir = Path(stc_dir)
         self.text_table = TextTable(table_dir) if table_dir else lambda x: x
         self.to_dict = to_dict
+        self.fill_empty = fill_empty
         self.__keys = [p.name[:-5] for p in self.stc_dir.glob("*.json")]
         self.__data = {}
 
@@ -55,7 +56,7 @@ class GameData(MutableMapping):
         logging.debug(f"Reading {name}.json")
         with (self.stc_dir / f"{name}.json").open("r", encoding="utf-8") as f:
             data = json.load(f)
-            data = convert_text(data, self.text_table)
+            data = convert_text(data, self.text_table, self.fill_empty)
             if self.to_dict and len(data) > 0:
                 k = (
                     "id"
@@ -96,17 +97,17 @@ def get_stc_data(stc_dir, table_dir=None, subset=None, to_dict=True):
     return GameData(stc_dir, table_dir, to_dict)
 
 
-def convert_text(data, text_table):
-    if type(data) == list:
-        return [convert_text(i, text_table) for i in data]
-    elif type(data) == dict:
-        return {k: convert_text(v, text_table) for k, v in data.items()}
+def convert_text(data, text_table, fill_empty=True):
+    if isinstance(data, list):
+        return [convert_text(i, text_table, fill_empty) for i in data]
+    elif isinstance(data, dict):
+        return {k: convert_text(v, text_table, fill_empty) for k, v in data.items()}
     else:
         text = text_table(data)
         if text != "":
             return text
         else:
-            return data
+            return data if fill_empty else ""
 
 
 # %%
