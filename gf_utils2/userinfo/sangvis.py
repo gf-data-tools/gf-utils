@@ -17,9 +17,7 @@ SangvisAttr = Literal[
 class SangvisUserInfo(BaseUserInfo):
     @cached_property
     def sangvis_with_user_info(self) -> dict[int, Sangvis]:
-        return {
-            int(k): Sangvis(v, self) for k, v in self["sangvis_with_user_info"].items()
-        }
+        return {int(i["id"]): Sangvis(i, self) for i in self["sangvis_with_user_info"]}
 
 
 @dataclass(init=False)
@@ -155,12 +153,10 @@ class Sangvis(BaseGameObject):
         rank = sangvis_info["rank"] - 2
         skl_effi = ceil(number * (0.8 + rank / 5) * (30 + 5 * skill_lv[0]))
         for lv in skill_lv[1:]:
-            print(skl_effi)
             if lv == 0:
                 continue
             skl_effi += ceil(number * (0.8 + rank / 5) * (13 + 2 * lv))
 
         res_effi = 200 if self.sangvis_resolution else 0
 
-        print(f"{atk_effi=} {def_effi=} {skl_effi=} {res_effi=}")
         return atk_effi + def_effi + skl_effi + res_effi
