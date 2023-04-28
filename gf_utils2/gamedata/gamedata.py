@@ -102,9 +102,9 @@ class GameData(MutableMapping):
 
 
 def convert_text(data, text_table):
-    if type(data) == list:
+    if isinstance(data, list):
         return [convert_text(i, text_table) for i in data]
-    elif type(data) == dict:
+    elif isinstance(data, dict):
         return {k: convert_text(v, text_table) for k, v in data.items()}
     else:
         text = text_table(data)
@@ -127,7 +127,7 @@ if __name__ == "__main__":
     stc_dir = R"..\GF_Data_Tools\data\ch\stc"
     catch_dir = R"..\GF_Data_Tools\data\ch\catchdata"
     stc = GameData([stc_dir, catch_dir], table_dir)
-    stc["achievement"]
-    print(list(stc.keys()))
-    stc["attendance_info"]
+
+    print(stc["achievement"])
+
 # %%
