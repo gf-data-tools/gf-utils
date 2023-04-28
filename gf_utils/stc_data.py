@@ -1,8 +1,8 @@
 # %%
 import json
 import logging
-import os
-from collections.abc import MutableMapping
+from collections.abc import Iterable, MutableMapping
+from itertools import chain
 from pathlib import Path
 
 from .text_table import TextTable
@@ -44,11 +44,17 @@ special_keys = {
 
 
 class GameData(MutableMapping):
-    def __init__(self, stc_dir, table_dir=None, to_dict=True, fill_empty=True) -> None:
-        self.stc_dir = Path(stc_dir)
+    def __init__(
+        self, stc_dir: Path | str | list, table_dir=None, to_dict=True, fill_empty=True
+    ) -> None:
+        if not isinstance(stc_dir, Iterable):
+            stc_dir = [stc_dir]
+        stc_dir = [Path(i) for i in stc_dir]
         self.text_table = TextTable(table_dir) if table_dir else lambda x: x
         self.to_dict = to_dict
         self.fill_empty = fill_empty
+
+        flies = chain(*[s.glob("*.json") for s in stc_dir])
         self.__keys = [p.name[:-5] for p in self.stc_dir.glob("*.json")]
         self.__data = {}
 

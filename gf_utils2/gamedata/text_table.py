@@ -25,7 +25,10 @@ class TextTable(MutableMapping):
         logger.debug(f"Loading {table_name}.txt")
         for lineno, line in enumerate(table_path.open("r", errors="ignore")):
             try:
-                key, value = line.strip().split(",", maxsplit=1)
+                try:
+                    key, value = line.strip().split(",", maxsplit=1)
+                except Exception as e:
+                    logger.debug(f"{repr(e)} in {table_path}:{lineno}")
                 value = re.sub(R"//c", ",", value)
                 value = re.sub(R"//n", "\n", value)
                 table[key] = value.strip()
