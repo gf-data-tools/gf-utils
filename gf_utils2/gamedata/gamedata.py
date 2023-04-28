@@ -1,8 +1,9 @@
 # %%
-import json
 from collections.abc import MutableMapping
+from itertools import chain
 from pathlib import Path
 
+import hjson as json
 from logger_tt import logger
 
 from .text_table import TextTable
@@ -44,30 +45,38 @@ special_keys = {
 
 
 class GameData(MutableMapping):
-    def __init__(self, stc_dir, table_dir=None, to_dict=True) -> None:
-        self.stc_dir = Path(stc_dir)
+    def __init__(self, stc_dir, table_dir=None, to_dict=True, ext="json") -> None:
+        if not isinstance(stc_dir, list):
+            stc_dir = [stc_dir]
+        stc_dir = [Path(i) for i in stc_dir]
         self.text_table = TextTable(table_dir) if table_dir else lambda x: x
         self.to_dict = to_dict
-        self.__keys = [p.name[:-5] for p in self.stc_dir.glob("*.json")]
+        self.ext = ext
+
+        self.__files = {
+            p.name.split(".")[0]: p
+            for p in chain(*[d.glob(f"*.{self.ext}") for d in stc_dir])
+        }
+
         self.__data = {}
 
     def __get_stc_dict(self, name):
-        logger.debug(f"Reading {name}.json")
-        with (self.stc_dir / f"{name}.json").open("r", encoding="utf-8") as f:
+        logger.debug(f"Reading {name}.{self.ext}")
+        with self.__files[name].open("r", encoding="utf-8") as f:
             data = json.load(f)
             data = convert_text(data, self.text_table)
             if self.to_dict and len(data) > 0:
                 k = (
                     "id"
-                    if "id" in data[0].keys()
+                    if "id" in data[-1].keys()
                     else (special_keys[name] if name in special_keys.keys() else None)
                 )
                 if k is not None:
-                    data = {d[k]: d for d in data}
+                    data = {d[k]: d for d in data if k in d}
         return data
 
     def __getitem__(self, key):
-        if key not in self.__keys:
+        if key not in self.__files:
             raise KeyError(key)
         if key not in self.__data:
             self.__data[key] = self.__get_stc_dict(key)
@@ -86,10 +95,10 @@ class GameData(MutableMapping):
         raise TypeError("GameData object does not support __setitem__")
 
     def __iter__(self):
-        return iter(self.__keys)
+        return iter(self.__files)
 
     def __len__(self):
-        return len(self.__keys)
+        return len(self.__files)
 
 
 def convert_text(data, text_table):
@@ -116,6 +125,9 @@ if __name__ == "__main__":
 
     table_dir = R"..\GF_Data_Tools\data\ch\asset\table"
     stc_dir = R"..\GF_Data_Tools\data\ch\stc"
-    stc = GameData(stc_dir, table_dir)
+    catch_dir = R"..\GF_Data_Tools\data\ch\catchdata"
+    stc = GameData([stc_dir, catch_dir], table_dir)
     stc["achievement"]
+    print(list(stc.keys()))
+    stc["attendance_info"]
 # %%
