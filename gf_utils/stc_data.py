@@ -80,9 +80,6 @@ class GameData(MutableMapping):
             self.__data[key] = self.__get_stc_dict(key)
         return self.__data[key]
 
-    def __getattr__(self, k):
-        return self[k]
-
     def __call__(self, k):
         return self[k]
 
