@@ -16,6 +16,7 @@ dependencies = [
     "tqdm",
     "pycryptodome",
     "logger_tt",
+    "hjson",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
