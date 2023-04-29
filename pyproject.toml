@@ -26,9 +26,10 @@ classifiers = [
 [project.scripts]
 
 [tool.setuptools]
-packages = [
-    'gf_utils', 
-    'gf_utils2',
+[tool.setuptools.packages.find]
+include = [
+    'gf_utils*', 
+    'gf_utils2*',
 ]
 
 [tool.isort]
