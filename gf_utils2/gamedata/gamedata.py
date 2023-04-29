@@ -105,10 +105,7 @@ def convert_text(data, text_table):
         return {k: convert_text(v, text_table) for k, v in data.items()}
     else:
         text = text_table(data)
-        if text != "":
-            return text
-        else:
-            return data
+        return text
 
 
 # %%
