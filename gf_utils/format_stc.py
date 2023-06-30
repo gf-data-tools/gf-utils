@@ -76,7 +76,10 @@ def format_stc(stc: str, mapping: str):
     type_ids = []
     for _ in range(col):
         type_ids.append(reader.read_byte())
-    assert len(type_ids) == len(stc_conf["fields"])
+    assert len(type_ids) == len(stc_conf["fields"]), (
+        len(type_ids),
+        len(stc_conf["fields"]),
+    )
 
     format = {
         stc_conf["fields"][i]: {
