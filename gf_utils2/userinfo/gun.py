@@ -258,6 +258,24 @@ class Gun(BaseGameObject):
                     ]
                 )
                 return equip_attr(attr) + type_speed * 10
+            case "rec":
+                type_ratio = float(
+                    gamedata["gun_type_info"][str(self.gun_info["type"])][
+                        f"basic_attribute_rec"
+                    ]
+                )
+                gun_ratio = gun_info[f"ratio_{attr}"]
+
+                basic_str = game_config[f"gun_rec_basic"]["parameter_value"]
+                basic_base, basic_inc, _ = (float(i) for i in basic_str.split(","))
+
+                gun_value = ceil(
+                    (basic_base + basic_inc * (self.gun_level - 1))
+                    * (type_ratio * gun_ratio / 100)
+                )
+
+                return gun_value
+
             case _:
                 raise ValueError(f"Unsupported attr {attr}")
 
@@ -311,7 +329,11 @@ class Gun(BaseGameObject):
         # 防御效能 = CEILING(生命*(35+闪避)/35*(4.2*100/MAX(1,100-护甲)-3.2),1)
         dodge_factor = (35 + gun_attr("dodge")) / 35
         armor_factor = 4.2 * 100 / max(1, 100 - gun_attr("armor")) - 3.2
-        def_effi = gf_ceil(gun_attr("life") * dodge_factor * armor_factor)
+        def_effi = gf_ceil(
+            (gun_attr("life") * 0.9 + gun_attr("rec") * 0.5 * 5)
+            * dodge_factor
+            * armor_factor
+        )
         # 1技能效能 = ceiling（5*(0.8+星级/10)*[35+5*(技能等级-1)]*(100+skill_effect_per)/100,1) + skill_effect
         # 2技能效能 = ceiling（5*(0.8+星级/10)*[15+2*(技能等级-1)]*(100+skill_effect_per)/100,1) + skill_effect
         skl1_effi = gf_ceil(

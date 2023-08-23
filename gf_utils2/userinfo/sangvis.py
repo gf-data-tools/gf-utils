@@ -10,7 +10,7 @@ from .base import BaseGameObject, BaseUserInfo
 
 SangvisAttr = Literal[
     "hp", "pow", "rate", "hit", "dodge", "armor", 
-    "armor_piercing", "crit", "crit_dmg"
+    "armor_piercing", "crit", "crit_dmg", "rec"
 ]  # fmt:skip
 
 
@@ -114,6 +114,38 @@ class Sangvis(BaseGameObject):
 
                 return resolution_value
 
+            case "rec":
+                size_coef = [100, 100, 102, 105, 108, 110][self.sangvis_shape_n]
+                eat_ratio = sangvis_info["eat_ratio"]
+                attr_ratio = sangvis_info[f"ratio_{attr}"]
+                advance_ratio = gamedata["sangvis_advance"][advance][f"advance_{attr}"]
+                level_ratio = self.sangvis_level + 39
+                type_basic = gamedata["sangvis_type"][sangvis_info["type"]][
+                    f"basic_{attr}"
+                ]
+
+                base_value = (
+                    size_coef
+                    * eat_ratio
+                    * attr_ratio
+                    * advance_ratio
+                    * level_ratio
+                    * type_basic
+                    / 1e8
+                )
+
+                resolution = gamedata["sangvis_resolution"][
+                    sangvis_info["resolution"] * 100 + self.sangvis_resolution
+                ]
+                assert resolution["group_id"] == sangvis_info["resolution"]
+                assert resolution["lv"] == self.sangvis_resolution
+                resolution_value = resolution[f"resolution_{attr}"]
+
+                formation_value = ceil(base_value / sangvis_info["formation"])
+                resolution_value = formation_value + resolution[f"resolution_{attr}"]
+
+                return resolution_value
+
             case "armor_piercing" | "crit" | "crit_dmg":
                 return sangvis_info[attr]
 
@@ -143,7 +175,7 @@ class Sangvis(BaseGameObject):
         )
         # Raise (Health * (35 + Dodge)/35 * (2.6 * 200/(200 - Gloves) - 1.6))
         def_effi = ceil(
-            get_attr("hp")
+            (1.1 * get_attr("hp") + 0.4 * get_attr("rec"))
             * ((35 + get_attr("dodge")) / 35)
             * (2.6 * 200 / max(1, 200 - get_attr("armor")) - 1.6)
         )
