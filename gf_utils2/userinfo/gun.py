@@ -309,8 +309,10 @@ class Gun(BaseGameObject):
             case 6:
                 # SG攻击 = 6*5*(3*弹量*(伤害+穿甲/3)*(1+暴击率*(暴击伤害-100)/10000)/(1.5+弹量*50/射速+0.5*弹量)*命中/(命中+23)+8)
                 type_factor = 6
-                rate_factor = gun_attr("bullet_number") / (
-                    1.5 + gun_attr("bullet_number") * (50 / gun_attr("rate") + 0.5)
+                rate_factor = (
+                    3
+                    * gun_attr("bullet_number")
+                    / (1.5 + gun_attr("bullet_number") * (50 / gun_attr("rate") + 0.5))
                 )
             case 5:
                 # MG攻击 = 7*5*((伤害+穿甲/3)*(1+暴击率*(暴击伤害-100)/10000)*弹量/(弹量/3+4+200/射速)*命中/(命中+23)+8)
