@@ -30,7 +30,12 @@ class TableBase:
         self.gamedata = gamedata
 
     def __getitem__(self, key):
-        return self.__itemclass__(self.gamedata[self.__tablename__][key], self.gamedata)
+        if key in self.gamedata[self.__tablename__]:
+            return self.__itemclass__(
+                self.gamedata[self.__tablename__][key], self.gamedata
+            )
+        else:
+            return TableBase.TableBase({}, self.gamedata)
 
 
 class BattleActionConfig(TableBase):
@@ -45,6 +50,8 @@ class BattleActionConfig(TableBase):
                 if (f := len(order) - len(delay)) > 0:
                     delay.extend([-1] * f)
                 for o, d in zip(order, delay):
+                    if o == 0:
+                        continue
                     string += f"创造物 {o} 延迟 {d}\n"
                     rep = self.gamedata.BattleCreation[o].inspect()
                     string += indent(rep)
@@ -195,6 +202,8 @@ class BattleSkillConfig(TableBase):
                 ]:
                     string += f"自身buff {buff_id}: {buff_tier}\n"
                     string += indent(self.gamedata.BattleBuff[buff_id].inspect())
+                    if buff_tier == "*":
+                        continue
                     buff_tier = int(buff_tier)
                     if buff_tier > 1e6:
                         string += indent(
@@ -316,6 +325,81 @@ class Gun(TableBase):
     __itemclass__ = Gun
 
 
+class Sangvis(TableBase):
+    __tablename__ = "sangvis"
+
+    class Sangvis(TableBase.TableBase):
+        def inspect(self):
+            string = super().inspect()
+            if i := self.data["normal_attack"]:
+                string += f"普攻 {i}\n"
+                string += indent(self.gamedata.BattleSkillConfig[i * 100 + 1].inspect())
+            if i := self.data["skill1"]:
+                string += f"一技能 {i}\n"
+                string += indent(
+                    self.gamedata.BattleSkillConfig[i * 100 + 10].inspect()
+                )
+            if self.data["skill2_type"] == 1 and (i := self.data["skill2"]):
+                string += f"二技能 {i}\n"
+                string += indent(
+                    self.gamedata.BattleSkillConfig[i * 100 + 10].inspect()
+                )
+            if i := self.data["skill3"]:
+                string += f"三技能 {i}\n"
+                string += indent(self.gamedata.BattleSkillConfig[i * 100 + 5].inspect())
+
+            if i := self.data["skill_advance"]:
+                string += f"四技能 {i}\n"
+                string += indent(self.gamedata.BattleSkillConfig[i * 100 + 5].inspect())
+
+            if s := self.data["passive_skill2"]:
+                for i in s.split(","):
+                    i = int(i)
+                    string += f"被动技能 {i}\n"
+                    string += indent(
+                        self.gamedata.BattleSkillConfig[i * 100 + 1].inspect()
+                    )
+            if s := self.data["dynamic_passive_skill"]:
+                for i in s.split(","):
+                    i = int(i)
+                    string += f"动态被动技能 {i}\n"
+                    try:
+                        string += indent(
+                            self.gamedata.BattleSkillConfig[i * 100 + 10].inspect()
+                        )
+                    except KeyError:
+                        string += indent(
+                            self.gamedata.BattleSkillConfig[i * 100 + 5].inspect()
+                        )
+
+            return string
+
+    __itemclass__ = Sangvis
+
+
+class EnemyCharacterType(TableBase):
+    __tablename__ = "enemy_character_type"
+
+    class EnemyCharacterType(TableBase.TableBase):
+        def inspect(self):
+            string = super().inspect()
+            if i := self.data["normal_attack"]:
+                string += f"普攻 {i}\n"
+                string += indent(self.gamedata.BattleSkillConfig[i * 100 + 1].inspect())
+
+            if s := self.data["passive_skill"]:
+                for i in s.split(","):
+                    i = int(i)
+                    string += f"被动技能 {i}\n"
+                    string += indent(
+                        self.gamedata.BattleSkillConfig[i * 100 + 1].inspect()
+                    )
+
+            return string
+
+    __itemclass__ = EnemyCharacterType
+
+
 class Inspector(GameData):
     def __init__(self, stc_dir, table_dir=None, to_dict=True, ext="json") -> None:
         super().__init__(stc_dir, table_dir, to_dict, ext)
@@ -331,7 +415,9 @@ class Inspector(GameData):
         self.BattleWatch = BattleWatch(self)
         self.BattleWatchTrigger = BattleWatchTrigger(self)
         self.BattleMovementInfo = BattleMovementInfo(self)
+        self.EnemyCharacterType = EnemyCharacterType(self)
         self.Gun = Gun(self)
+        self.Sangvis = Sangvis(self)
 
 
 # %%
