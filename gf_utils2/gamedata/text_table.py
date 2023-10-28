@@ -23,7 +23,9 @@ class TextTable(MutableMapping):
         table = {}
         table_path = self.table_dir / f"{table_name}.txt"
         logger.debug(f"Loading {table_name}.txt")
-        for lineno, line in enumerate(table_path.open("r", errors="ignore")):
+        for lineno, line in enumerate(
+            table_path.open("r", errors="ignore", encoding="utf-8")
+        ):
             try:
                 try:
                     key, value = line.strip().split(",", maxsplit=1)
