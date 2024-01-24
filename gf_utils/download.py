@@ -39,7 +39,7 @@ def download(url, path, max_retry=10, timeout_sec=30):
     path = str(path)
     socket.setdefaulttimeout(timeout_sec)
     fname = os.path.split(path)[-1]
-    logger.info(f"Start downloading {fname}")
+    logger.info(f"Start downloading {fname} from {url}")
     for i in range(max_retry):
         try:
             if not os.path.exists(path):

@@ -66,11 +66,12 @@ class BattleBuff(TableBase):
     class BattleBuff(TableBase.TableBase):
         def inspect(self):
             string = super().inspect()
-            if (skl := int(self.data["forced_skill"])) != 0:
-                string += f"触发技能 {skl}\n"
-                string += indent(
-                    self.gamedata.BattleSkillConfig[skl * 100 + 1].inspect()
-                )
+            if self.data["forced_skill"] != "0":
+                for skl in [int(i) for i in self.data["forced_skill"].split(",")]:
+                    string += f"触发技能 {skl}\n"
+                    string += indent(
+                        self.gamedata.BattleSkillConfig[skl * 100 + 1].inspect()
+                    )
             if (watch := int(self.data["watch_id"])) != 0:
                 string += f"添加监视 {watch}\n"
                 string += indent(self.gamedata.BattleWatch[watch].inspect())
@@ -196,7 +197,7 @@ class BattleSkillConfig(TableBase):
             if (i := self.data["action_id"]) != 0:
                 string += f"动作 {i}\n"
                 string += indent(self.gamedata.BattleActionConfig[i].inspect())
-            if self.data["buff_id_self"] != "0":
+            if self.data["buff_id_self"] and self.data["buff_id_self"] != "0":
                 for buff_id, buff_tier in [
                     i.split(":") for i in self.data["buff_id_self"].split(",")
                 ]:
@@ -363,11 +364,11 @@ class Sangvis(TableBase):
                 for i in s.split(","):
                     i = int(i)
                     string += f"动态被动技能 {i}\n"
-                    try:
+                    if i * 100 + 10 in self.gamedata["battle_skill_config"]:
                         string += indent(
                             self.gamedata.BattleSkillConfig[i * 100 + 10].inspect()
                         )
-                    except KeyError:
+                    else:
                         string += indent(
                             self.gamedata.BattleSkillConfig[i * 100 + 5].inspect()
                         )
