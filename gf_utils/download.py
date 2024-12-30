@@ -44,7 +44,7 @@ def download(url, path, max_retry=10, timeout_sec=30):
         try:
             if not os.path.exists(path):
                 req = request.Request(url, headers={"User-Agent": ""})
-                resp = request.urlopen(url, path + ".tmp")
+                resp = request.urlopen(url)
                 with open(path + ".tmp", "wb") as f:
                     f.write(resp.read())
                 os.rename(path + ".tmp", path)
