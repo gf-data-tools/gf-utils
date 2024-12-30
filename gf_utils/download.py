@@ -43,7 +43,10 @@ def download(url, path, max_retry=10, timeout_sec=30):
     for i in range(max_retry):
         try:
             if not os.path.exists(path):
-                request.urlretrieve(url, path + ".tmp")
+                req = request.Request(url, headers={"User-Agent": ""})
+                resp = request.urlopen(url, path + ".tmp")
+                with open(path + ".tmp", "wb") as f:
+                    f.write(resp.read())
                 os.rename(path + ".tmp", path)
         except (URLError, timeout, ConnectionResetError):
             logger.warning(f"Failed to download {fname} for {i+1}/10 tries")
